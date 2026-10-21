@@ -39,7 +39,7 @@
     <text class="empty-desc">可以去图书馆，或者留一点时间给自己。</text>
   </view>
 
-  <button class="add" bindtap="addCourse">+ 添加课程</button>
+  <view class="sync-tip">课程数据来自教务系统同步，暂不支持手动添加</view>
   <view class="tip" bindtap="askCourse">
     <text class="tip-text">想直接问课表？用语音试试</text>
     <text class="chev">›</text>

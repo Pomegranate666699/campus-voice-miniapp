@@ -1,4 +1,5 @@
 const { answerFor, fallbackAnswer } = require('../../utils/campus-qa')
+const history = require('../../services/history')
 
 let recorder = null
 let pluginReady = false
@@ -32,6 +33,18 @@ Page({
   onShow() {
     const tabBar = this.getTabBar && this.getTabBar()
     if (tabBar) tabBar.setData({ selected: 2 })
+
+    // 从首页带着问题跳过来：取出问题并自动回答
+    const app = getApp()
+    const pending = app && app.globalData && app.globalData.pendingQuestion
+    if (pending) {
+      app.globalData.pendingQuestion = ''
+      this.setData({ question: pending })
+      const self = this
+      setTimeout(function () {
+        self.submit()
+      }, 60)
+    }
   },
 
   onUnload() {
@@ -171,6 +184,8 @@ Page({
     }
     const answer = answerFor(q) || fallbackAnswer
     this.setData({ showResult: true, resultText: answer })
+    // 记一条历史，供「我的 → 问答记录」查看
+    history.add({ question: q, answer: answer })
     if (wx.pageScrollTo) {
       setTimeout(() => {
         try { wx.pageScrollTo({ selector: '#answer', duration: 200, offsetTop: -20 }) } catch (e) {}

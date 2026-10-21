@@ -30,11 +30,18 @@ Page({
   },
   submitQuery() {
     const query = (this.data.query || '').trim()
-    if (!query) return wx.showToast({ title: '请输入想了解的校园服务', icon: 'none' })
-    wx.navigateTo({ url: `/pages/voice/voice?text=${encodeURIComponent(query)}` })
+    if (!query) {
+      wx.showToast({ title: '请输入想了解的校园服务', icon: 'none' })
+      return
+    }
+    // voice 是 tabBar 页面，只能用 switchTab，而 switchTab 不能带参数，
+    // 所以问题先存在全局，等语音页显示时再取出来。
+    getApp().globalData.pendingQuestion = query
+    wx.switchTab({ url: '/pages/voice/voice' })
   },
   onExampleTap(e) {
-    wx.navigateTo({ url: `/pages/voice/voice?text=${encodeURIComponent(e.currentTarget.dataset.text)}` })
+    getApp().globalData.pendingQuestion = e.currentTarget.dataset.text
+    wx.switchTab({ url: '/pages/voice/voice' })
   },
   openProfile() { wx.switchTab({ url: '/pages/profile/profile' }) }
 })
