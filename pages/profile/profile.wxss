@@ -1,0 +1,25 @@
+.profile { background: #f2f2ee; }
+
+.profile-head { display: flex; align-items: center; padding: 20rpx 2rpx 30rpx; }
+.avatar { display: flex; flex: none; align-items: center; justify-content: center; width: 104rpx; height: 104rpx; border-radius: 24rpx; background: #e6ece9; color: #1f6b5e; font-size: 40rpx; font-weight: 600; }
+.profile-id { display: flex; flex: 1; flex-direction: column; min-width: 0; margin-left: 20rpx; }
+.profile-name { font-size: 38rpx; font-weight: 600; color: #1c1e1d; }
+.profile-school { margin-top: 6rpx; font-size: 22rpx; color: #8b928e; }
+.profile-tag { flex: none; padding: 4rpx 10rpx; border: 1rpx solid #d6d9d2; border-radius: 6rpx; font-size: 20rpx; color: #7d8581; }
+
+.stats { display: flex; padding: 24rpx 0; }
+.stat { flex: 1; display: flex; flex-direction: column; align-items: center; }
+.stat + .stat { border-left: 1rpx solid #eef0ea; }
+.stat-num { font-size: 36rpx; font-weight: 600; line-height: 1.2; color: #1c1e1d; }
+.stat-label { margin-top: 4rpx; font-size: 21rpx; color: #7d8581; }
+
+.menu { margin-top: 20rpx; padding: 0 24rpx; }
+.menu-row { display: flex; align-items: center; min-height: 100rpx; padding: 20rpx 0; }
+.menu-row + .menu-row { border-top: 1rpx solid #eef0ea; }
+.menu-body { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.menu-title { font-size: 28rpx; color: #2a302e; }
+.menu-sub { margin-top: 4rpx; font-size: 21rpx; color: #8b928e; }
+
+.about { display: flex; align-items: center; justify-content: space-between; margin-top: 20rpx; padding: 24rpx; }
+.about-title { font-size: 26rpx; color: #2a302e; }
+.about-version { font-size: 22rpx; color: #9aa09c; }

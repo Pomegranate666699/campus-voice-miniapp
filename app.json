@@ -1,0 +1,62 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/course/course",
+    "pages/voice/voice",
+    "pages/wall/wall",
+    "pages/profile/profile"
+  ],
+  "window": {
+    "navigationBarTitleText": "南洋智声校园",
+    "navigationBarBackgroundColor": "#f2f2ee",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f2f2ee",
+    "backgroundTextStyle": "dark"
+  },
+  "permission": {
+    "scope.record": {
+      "desc": "用于语音问答，将你的校园问题转换为文字"
+    }
+  },
+  "tabBar": {
+    "color": "#8a9c97",
+    "selectedColor": "#1f7666",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "assets/home-normal.png",
+        "selectedIconPath": "assets/home-selected.png"
+      },
+      {
+        "pagePath": "pages/course/course",
+        "text": "课程",
+        "iconPath": "assets/course-normal.png",
+        "selectedIconPath": "assets/course-selected.png"
+      },
+      {
+        "pagePath": "pages/voice/voice",
+        "text": "语音",
+        "iconPath": "assets/voice-normal.png",
+        "selectedIconPath": "assets/voice-selected.png"
+      },
+      {
+        "pagePath": "pages/wall/wall",
+        "text": "校园墙",
+        "iconPath": "assets/wall-normal.png",
+        "selectedIconPath": "assets/wall-selected.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "assets/profile-normal.png",
+        "selectedIconPath": "assets/profile-selected.png"
+      }
+    ],
+    "custom": true
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2"
+}

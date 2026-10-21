@@ -1,0 +1,36 @@
+.voice { background: #f2f2ee; }
+
+.tabs { display: flex; margin-bottom: 24rpx; border-bottom: 1rpx solid #e4e5df; }
+.tab { position: relative; flex: 1; padding: 18rpx 0; text-align: center; font-size: 27rpx; color: #6c7571; }
+.tab-on { color: #1c1e1d; font-weight: 600; }
+.tab-on:after { content: ""; position: absolute; left: 50%; bottom: -1rpx; width: 48rpx; height: 4rpx; margin-left: -24rpx; border-radius: 2rpx; background: #1f6b5e; }
+
+.mic { display: flex; flex-direction: column; align-items: center; padding: 36rpx 24rpx 30rpx; }
+.mic-btn { display: flex; align-items: center; justify-content: center; width: 132rpx; height: 132rpx; border-radius: 50%; background: #1f6b5e; transition: transform .12s ease, box-shadow .2s ease; }
+.mic-active .mic-btn { box-shadow: 0 0 0 14rpx rgba(31, 107, 94, .10); animation: mic-pulse 1.2s ease-in-out infinite; }
+.mic-active .mic-title { color: #1f6b5e; }
+@keyframes mic-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+.wave-lg { display: flex; align-items: center; height: 56rpx; }
+.wbar { width: 6rpx; border-radius: 3rpx; background: #fff; }
+.wbar + .wbar { margin-left: 7rpx; }
+.w1, .w5 { height: 16rpx; }
+.w2, .w4 { height: 34rpx; }
+.w3 { height: 52rpx; }
+.mic-title { margin-top: 20rpx; font-size: 28rpx; color: #2a302e; }
+.mic-hint { margin-top: 6rpx; font-size: 21rpx; color: #9aa09c; }
+
+.ask { margin-top: 20rpx; padding: 24rpx; }
+.ask-label { display: block; font-size: 24rpx; color: #6c7571; }
+.chips { display: flex; flex-wrap: wrap; margin-top: 14rpx; }
+.chip { margin: 0 12rpx 12rpx 0; padding: 10rpx 16rpx; border: 1rpx solid #e4e5df; border-radius: 6rpx; background: #fafaf7; font-size: 23rpx; color: #3a403d; }
+.input-row { display: flex; align-items: center; height: 84rpx; margin-top: 10rpx; padding: 0 8rpx 0 18rpx; border: 1rpx solid #e4e5df; border-radius: 12rpx; background: #fafaf7; }
+.input-field { flex: 1; min-width: 0; height: 84rpx; font-size: 26rpx; }
+.send { display: flex; flex: none; align-items: center; justify-content: center; height: 60rpx; padding: 0 26rpx; border-radius: 8rpx; background: #1f6b5e; color: #fff; font-size: 24rpx; }
+
+.answer { margin-top: 20rpx; padding: 24rpx; }
+.answer-label { font-size: 22rpx; color: #1f6b5e; }
+.answer-text { display: block; margin-top: 10rpx; font-size: 27rpx; line-height: 1.7; color: #2a302e; }
+.footnote { display: block; margin-top: 28rpx; font-size: 20rpx; color: #9aa09c; text-align: center; }

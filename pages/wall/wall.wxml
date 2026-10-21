@@ -1,0 +1,49 @@
+<view class="wall-page">
+  <view class="wall-top-area">
+    <view class="wall-top">
+      <view class="wall-head">
+        <text class="page-title">校园墙</text>
+        <text class="page-sub">{{onlineCount}} 位同学在线 · 友善分享</text>
+      </view>
+      <view class="publish" bindtap="publish">发布</view>
+    </view>
+
+    <view class="search">
+      <view class="search-icon"></view>
+      <input class="search-input" value="{{keyword}}" placeholder="搜索校园动态" placeholder-class="ph" bindinput="onSearch" />
+      <text wx:if="{{keyword}}" class="clear" bindtap="clearSearch">清除</text>
+    </view>
+
+    <scroll-view scroll-x class="cats">
+      <view wx:for="{{categories}}" wx:key="id" data-id="{{item.id}}" bindtap="selectCategory" class="cat {{item.id === activeCategory ? 'cat-on' : ''}}">{{item.label}}</view>
+    </scroll-view>
+  </view>
+
+  <view class="feed">
+    <view class="feed-head">
+      <text class="feed-title">最新动态</text>
+      <text class="feed-count">{{postCount}} 条</text>
+    </view>
+
+    <view wx:for="{{filteredPosts}}" wx:key="id" class="post">
+      <view class="post-head">
+        <view class="avatar {{item.avatarTone}}">{{item.avatar}}</view>
+        <view class="post-meta">
+          <text class="post-name">{{item.author}}</text>
+          <text class="post-time">{{item.time}} · {{item.category}}</text>
+        </view>
+      </view>
+      <text class="post-content">{{item.content}}</text>
+      <view class="post-actions">
+        <text class="act {{item.liked ? 'act-on' : ''}}" data-id="{{item.id}}" bindtap="likePost">{{item.liked ? '已赞' : '赞'}} {{item.likes}}</text>
+        <text class="act">评论 {{item.comments}}</text>
+        <text class="detail">查看详情</text>
+      </view>
+    </view>
+
+    <view wx:if="{{filteredPosts.length === 0}}" class="empty">
+      <text class="empty-title">没有找到相关动态</text>
+      <text class="empty-desc">换个关键词或分类试试</text>
+    </view>
+  </view>
+</view>

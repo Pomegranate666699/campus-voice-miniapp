@@ -1,0 +1,64 @@
+<view class="page home">
+  <view class="topbar">
+    <view class="brand">
+      <view class="brand-mark">南</view>
+      <view class="brand-text">
+        <text class="brand-name">南洋智声</text>
+        <text class="brand-school">嘉兴南洋职业技术学院</text>
+      </view>
+    </view>
+    <view class="avatar" bindtap="openProfile">{{avatar}}</view>
+  </view>
+
+  <view class="greet">
+    <text class="greet-title">{{greeting}}</text>
+    <text class="greet-sub">查课表、找服务、问校园，一句话就够。</text>
+  </view>
+
+  <view class="ask card">
+    <view class="search">
+      <view class="search-icon"></view>
+      <input class="search-input" value="{{query}}" bindinput="onInput" confirm-type="search" bindconfirm="submitQuery" placeholder="例如：图书馆几点关门" placeholder-class="ph" />
+      <text class="search-go" bindtap="submitQuery">查询</text>
+    </view>
+    <view class="ask-divider"></view>
+    <view class="voice-entry" bindtap="onVoiceTap">
+      <view class="wave">
+        <view class="bar b1"></view><view class="bar b2"></view><view class="bar b3"></view><view class="bar b4"></view>
+      </view>
+      <text class="voice-title">语音提问</text>
+      <text class="voice-desc">按住说出你的问题</text>
+      <text class="chev">›</text>
+    </view>
+  </view>
+
+  <view class="stats card">
+    <view class="stat"><text class="stat-num">1<text class="stat-unit">节</text></text><text class="stat-label">今日课程</text></view>
+    <view class="stat"><text class="stat-num">24<text class="stat-unit">项</text></text><text class="stat-label">校园服务</text></view>
+    <view class="stat"><text class="stat-num">3<text class="stat-unit">条</text></text><text class="stat-label">校园动态</text></view>
+  </view>
+
+  <view class="notice">
+    <text class="notice-tag">通知</text>
+    <text class="notice-text">本周五晚操场有社团迎新活动</text>
+    <text class="notice-date">10-20</text>
+  </view>
+
+  <view class="sec"><text class="sec-title">常用入口</text></view>
+  <view class="list card">
+    <view class="row" wx:for="{{shortcuts}}" wx:key="id" data-id="{{item.id}}" bindtap="onShortcutTap">
+      <view class="row-body"><text class="row-title">{{item.title}}</text><text class="row-desc">{{item.desc}}</text></view>
+      <text class="chev">›</text>
+    </view>
+  </view>
+
+  <view class="sec"><text class="sec-title">你可以这样问</text></view>
+  <view class="list card">
+    <view class="row" wx:for="{{examples}}" wx:key="*this" data-text="{{item}}" bindtap="onExampleTap">
+      <text class="row-title">{{item}}</text>
+      <text class="chev">›</text>
+    </view>
+  </view>
+
+  <text class="footnote">校园内容以学校发布为准，当前为演示数据。</text>
+</view>

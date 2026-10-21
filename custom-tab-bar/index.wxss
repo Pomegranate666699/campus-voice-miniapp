@@ -1,0 +1,26 @@
+.custom-tabbar { position: fixed; z-index: 999; left: 0; right: 0; bottom: 0; height: 132rpx; padding-bottom: env(safe-area-inset-bottom); box-sizing: content-box; display: flex; align-items: stretch; background: #fff; border-top: 1rpx solid #e4e5df; }
+
+.tab-item { position: relative; flex: 1; height: 132rpx; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 14rpx; box-sizing: border-box; color: #8a9c97; font-size: 20rpx; }
+.icon-box { width: 50rpx; height: 50rpx; display: flex; align-items: center; justify-content: center; margin-bottom: 8rpx; }
+.tab-icon { width: 46rpx; height: 46rpx; }
+.tab-label { line-height: 1.2; white-space: nowrap; }
+.tab-selected { color: #1f6b5e; font-weight: 600; }
+
+.voice-item { z-index: 3; }
+.voice-item .icon-box { position: absolute; left: 50%; top: -58rpx; transform: translateX(-50%); width: 128rpx; height: 128rpx; margin: 0; padding: 8rpx; box-sizing: border-box; border-radius: 50%; background: #fff; border: 1rpx solid #e4e5df; box-shadow: 0 6rpx 18rpx rgba(25, 102, 86, .10); display: flex; align-items: center; justify-content: center; }
+.voice-disc { width: 110rpx; height: 110rpx; box-sizing: border-box; border-radius: 50%; background: #1f6b5e; border: 5rpx solid #dceee8; display: flex; align-items: center; justify-content: center; }
+.voice-item:not(.tab-selected) .voice-disc { background: #2a7a6c; }
+.voice-wave { display: flex; align-items: center; justify-content: center; height: 56rpx; }
+.wave-bar { width: 8rpx; border-radius: 8rpx; background: #fff; }
+.wave-bar + .wave-bar { margin-left: 7rpx; }
+.b1, .b5 { height: 18rpx; }
+.b2, .b4 { height: 34rpx; }
+.b3 { height: 52rpx; }
+.voice-item.tab-selected .wave-bar { animation: voice-wave 1.15s ease-in-out infinite; }
+.voice-item.tab-selected .b2 { animation-delay: .14s; }
+.voice-item.tab-selected .b3 { animation-delay: .28s; }
+.voice-item.tab-selected .b4 { animation-delay: .42s; }
+.voice-item.tab-selected .b5 { animation-delay: .56s; }
+@keyframes voice-wave { 0%, 100% { transform: scaleY(.55); } 50% { transform: scaleY(1); } }
+.voice-item .tab-label { margin-bottom: 0; }
+.voice-item.tab-selected .tab-label { color: #1f6b5e; }

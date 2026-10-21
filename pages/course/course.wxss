@@ -1,0 +1,34 @@
+.course { background: #f2f2ee; }
+
+.days { display: flex; justify-content: space-between; padding: 12rpx; }
+.day { width: 86rpx; height: 100rpx; border-radius: 10rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #5f6764; }
+.day-name { font-size: 21rpx; }
+.day-date { margin-top: 6rpx; font-size: 21rpx; }
+.day-selected { background: #1f6b5e; color: #fff; }
+.day-selected .day-name, .day-selected .day-date { color: #fff; }
+
+.day-head { display: flex; align-items: flex-end; justify-content: space-between; margin: 32rpx 2rpx 14rpx; }
+.day-head-text { display: flex; align-items: baseline; }
+.day-title { font-size: 32rpx; font-weight: 600; color: #1c1e1d; }
+.day-count { margin-left: 12rpx; font-size: 21rpx; color: #7d8581; }
+.today { font-size: 23rpx; color: #1f6b5e; }
+
+.schedule { padding: 0 24rpx; overflow: hidden; }
+.course-row { display: flex; padding: 24rpx 0; }
+.course-row + .course-row { border-top: 1rpx solid #eef0ea; }
+.course-time { flex: none; width: 96rpx; display: flex; flex-direction: column; }
+.t-start { font-size: 28rpx; font-weight: 600; line-height: 1.2; color: #1c1e1d; }
+.t-end { margin-top: 4rpx; font-size: 20rpx; color: #9aa09c; }
+.course-body { flex: 1; min-width: 0; margin-left: 8rpx; }
+.course-name { display: block; font-size: 30rpx; font-weight: 600; color: #1c1e1d; }
+.course-meta { display: block; margin-top: 8rpx; font-size: 22rpx; color: #6c7571; }
+.course-teacher { display: block; margin-top: 2rpx; font-size: 21rpx; color: #9aa09c; }
+.course-type { flex: none; align-self: flex-start; margin-left: 12rpx; padding: 2rpx 8rpx; border: 1rpx solid #e4e5df; border-radius: 5rpx; font-size: 20rpx; color: #6c7571; }
+
+.empty { display: flex; flex-direction: column; align-items: center; padding: 56rpx 24rpx; background: #fff; border: 1rpx solid #e4e5df; border-radius: 16rpx; }
+.empty-title { font-size: 27rpx; color: #3a403d; }
+.empty-desc { margin-top: 8rpx; font-size: 22rpx; color: #8b928e; text-align: center; }
+
+.add { display: flex; align-items: center; justify-content: center; height: 88rpx; margin-top: 24rpx; border: 1rpx solid #d6d9d2; border-radius: 12rpx; background: transparent; color: #1f6b5e; font-size: 26rpx; }
+.tip { display: flex; align-items: center; margin-top: 24rpx; padding: 0 2rpx; }
+.tip-text { flex: 1; font-size: 23rpx; color: #6c7571; }

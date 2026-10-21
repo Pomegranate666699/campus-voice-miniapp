@@ -1,0 +1,41 @@
+<view class="page voice">
+  <view class="page-head">
+    <text class="page-title">语音问答</text>
+    <text class="page-sub">长按麦克风说话，松开自动识别</text>
+  </view>
+
+  <view class="tabs">
+    <view class="tab tab-on">语音</view>
+    <view class="tab" bindtap="focusText">文字</view>
+  </view>
+
+  <view class="mic card {{recording ? 'mic-active' : ''}}">
+    <view class="mic-btn" bindtouchstart="onVoiceStart" bindtouchend="onVoiceEnd" bindtouchcancel="onVoiceCancel">
+      <view class="wave-lg">
+        <view class="wbar w1"></view><view class="wbar w2"></view><view class="wbar w3"></view><view class="wbar w4"></view><view class="wbar w5"></view>
+      </view>
+    </view>
+    <text class="mic-title">{{voiceTitle}}</text>
+    <text class="mic-hint">{{voiceHint}}</text>
+  </view>
+
+  <view class="ask card">
+    <text class="ask-label">你可以这样问</text>
+    <view class="chips">
+      <text class="chip" bindtap="fillLibrary">图书馆开放时间</text>
+      <text class="chip" bindtap="fillCourse">今天有什么课</text>
+      <text class="chip" bindtap="fillCanteen">食堂推荐</text>
+    </view>
+    <view class="input-row">
+      <input class="input-field" value="{{question}}" bindinput="onInput" placeholder="输入你的校园问题" placeholder-class="ph" />
+      <button class="send" bindtap="submit">发送</button>
+    </view>
+  </view>
+
+  <view wx:if="{{showResult}}" id="answer" class="answer card">
+    <text class="answer-label">校园助手</text>
+    <text class="answer-text">{{resultText}}</text>
+  </view>
+
+  <text class="footnote">演示数据 · 具体以学校最新通知为准</text>
+</view>

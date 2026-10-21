@@ -1,0 +1,15 @@
+# 依赖
+node_modules/
+miniprogram_npm/
+
+# 云函数本地依赖
+cloudfunctions/*/node_modules/
+
+# 编辑器 / 开发者工具私有配置
+project.private.config.json
+.DS_Store
+Thumbs.db
+
+# 历史备份文件（改造前的 .bak，已归档到 .backup/）
+*.bak-*
+.backup/

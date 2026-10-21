@@ -1,0 +1,7 @@
+# 南洋智声校园（最终可运行项目）
+
+请在微信开发者工具中打开本目录：
+C:\Users\LEGION\Documents\Codex\2026-10-14\new-chat\outputs\campus-voice-miniapp-final
+
+本项目只注册五个页面：首页、课程、语音、校园墙、我的。
+语音、校园墙、我的页面均使用静态演示数据，不依赖云开发环境。

@@ -1,0 +1,47 @@
+<view class="page course">
+  <view class="page-head">
+    <text class="page-title">课程安排</text>
+    <text class="page-sub">2026 秋季学期 · 第 {{week}} 周</text>
+  </view>
+
+  <view class="days card">
+    <view wx:for="{{days}}" wx:key="label" class="day {{item.selectedClass}}" data-index="{{index}}" bindtap="selectDay">
+      <text class="day-name">{{item.label}}</text>
+      <text class="day-date">{{item.date}}</text>
+    </view>
+  </view>
+
+  <view class="day-head">
+    <view class="day-head-text">
+      <text class="day-title">{{selectedDay}}</text>
+      <text class="day-count">{{courseCount}} 节课</text>
+    </view>
+    <text class="today" bindtap="chooseToday">回到今天</text>
+  </view>
+
+  <view class="schedule card" wx:if="{{courseCount > 0}}">
+    <view class="course-row" wx:for="{{courses}}" wx:key="id">
+      <view class="course-time">
+        <text class="t-start">{{item.start}}</text>
+        <text class="t-end">{{item.end}}</text>
+      </view>
+      <view class="course-body">
+        <text class="course-name">{{item.name}}</text>
+        <text class="course-meta">{{item.period}} · {{item.room}}</text>
+        <text class="course-teacher">{{item.teacher}}</text>
+      </view>
+      <text class="course-type">{{item.type}}</text>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{courseCount === 0}}">
+    <text class="empty-title">今天没有课程安排</text>
+    <text class="empty-desc">可以去图书馆，或者留一点时间给自己。</text>
+  </view>
+
+  <button class="add" bindtap="addCourse">+ 添加课程</button>
+  <view class="tip" bindtap="askCourse">
+    <text class="tip-text">想直接问课表？用语音试试</text>
+    <text class="chev">›</text>
+  </view>
+</view>
