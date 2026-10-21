@@ -25,6 +25,7 @@
   },
   "compileType": "miniprogram",
   "appid": "wx50aa6fa012535202",
+  "cloudfunctionRoot": "cloudfunctions/",
   "packOptions": {
     "ignore": [],
     "include": []
