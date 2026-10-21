@@ -3,6 +3,8 @@
 .profile-head { display: flex; align-items: center; padding: 20rpx 2rpx 30rpx; }
 .avatar { display: flex; flex: none; align-items: center; justify-content: center; width: 104rpx; height: 104rpx; border-radius: 24rpx; background: #e6ece9; color: #1f6b5e; font-size: 40rpx; font-weight: 600; }
 .profile-id { display: flex; flex: 1; flex-direction: column; min-width: 0; margin-left: 20rpx; }
+.name-row { display: flex; align-items: baseline; }
+.edit-hint { margin-left: 14rpx; font-size: 20rpx; color: #a2a8a4; }
 .profile-name { font-size: 38rpx; font-weight: 600; color: #1c1e1d; }
 .profile-school { margin-top: 6rpx; font-size: 22rpx; color: #8b928e; }
 .profile-tag { flex: none; padding: 4rpx 10rpx; border: 1rpx solid #d6d9d2; border-radius: 6rpx; font-size: 20rpx; color: #7d8581; }

@@ -4,7 +4,8 @@
     "pages/course/course",
     "pages/voice/voice",
     "pages/wall/wall",
-    "pages/profile/profile"
+    "pages/profile/profile",
+    "pages/history/history"
   ],
   "window": {
     "navigationBarTitleText": "南洋智声校园",

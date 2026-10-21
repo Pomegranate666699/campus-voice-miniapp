@@ -1,0 +1,25 @@
+<view class="page">
+  <view class="page-head">
+    <text class="page-title">问答记录</text>
+    <text class="page-sub">最近 30 条，只存在这台设备</text>
+  </view>
+
+  <view wx:if="{{items.length === 0}}" class="state">
+    <text class="state-title">还没有问答记录</text>
+    <text class="state-desc">去「语音」页问一个问题，这里就会出现记录</text>
+  </view>
+
+  <block wx:else>
+    <view wx:for="{{items}}" wx:key="id" class="item card" data-id="{{item.id}}" bindtap="onTapItem">
+      <view class="item-head">
+        <text class="item-q">{{item.question}}</text>
+        <text class="item-time">{{item.time}}</text>
+      </view>
+      <text class="item-a">{{item.answer}}</text>
+    </view>
+
+    <view class="clear-row">
+      <text class="clear-btn" bindtap="clearAll">清空全部记录</text>
+    </view>
+  </block>
+</view>

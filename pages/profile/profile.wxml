@@ -1,26 +1,29 @@
 <view class="page profile">
-  <view class="profile-head">
-    <view class="avatar">同</view>
+  <view class="profile-head" bindtap="editNickname">
+    <view class="avatar">{{me.initial}}</view>
     <view class="profile-id">
-      <text class="profile-name">演示同学</text>
-      <text class="profile-school">移动应用开发 · 嘉兴南洋职业技术学院</text>
+      <view class="name-row">
+        <text class="profile-name">{{me.nickname}}</text>
+        <text class="edit-hint">修改</text>
+      </view>
+      <text class="profile-school">{{mode === 'cloud' ? '云端账号' : '本地账号'}} · 嘉兴南洋职业技术学院</text>
     </view>
-    <text class="profile-tag">演示账号</text>
+    <text class="profile-tag">{{mode === 'cloud' ? '云端' : '本地'}}</text>
   </view>
 
   <view class="stats card">
-    <view class="stat"><text class="stat-num">12</text><text class="stat-label">问答记录</text></view>
-    <view class="stat"><text class="stat-num">6</text><text class="stat-label">收藏课程</text></view>
-    <view class="stat"><text class="stat-num">3</text><text class="stat-label">发布动态</text></view>
+    <view class="stat"><text class="stat-num">{{stats.posts}}</text><text class="stat-label">发布动态</text></view>
+    <view class="stat"><text class="stat-num">{{stats.likes}}</text><text class="stat-label">点过的赞</text></view>
+    <view class="stat"><text class="stat-num">{{historyCount}}</text><text class="stat-label">问答记录</text></view>
   </view>
 
   <view class="menu card">
-    <view class="menu-row" bindtap="history">
-      <view class="menu-body"><text class="menu-title">问答记录</text><text class="menu-sub">回顾你的校园问题</text></view>
+    <view class="menu-row" bindtap="openHistory">
+      <view class="menu-body"><text class="menu-title">问答记录</text><text class="menu-sub">回顾你问过的问题</text></view>
       <text class="chev">›</text>
     </view>
-    <view class="menu-row" bindtap="privacy">
-      <view class="menu-body"><text class="menu-title">数据与隐私</text><text class="menu-sub">管理本地资料</text></view>
+    <view class="menu-row" bindtap="openPrivacy">
+      <view class="menu-body"><text class="menu-title">数据与隐私</text><text class="menu-sub">数据到底存在哪里</text></view>
       <text class="chev">›</text>
     </view>
     <view class="menu-row" bindtap="feedback">
@@ -30,7 +33,7 @@
   </view>
 
   <view class="about card">
-    <text class="about-title">关于南洋智声</text>
-    <text class="about-version">v2.0.0</text>
+    <text class="about-title">南洋智声 · 校园综合服务</text>
+    <text class="about-version">v{{version}}</text>
   </view>
 </view>
