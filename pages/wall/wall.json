@@ -1,4 +1,7 @@
-{"navigationBarTitleText":"校园墙"}
-
-
-
+{
+  "navigationBarTitleText": "校园墙",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "onReachBottomDistance": 80,
+  "usingComponents": {}
+}

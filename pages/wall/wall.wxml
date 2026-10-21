@@ -3,9 +3,9 @@
     <view class="wall-top">
       <view class="wall-head">
         <text class="page-title">校园墙</text>
-        <text class="page-sub">{{onlineCount}} 位同学在线 · 友善分享</text>
+        <text class="page-sub">{{mode === 'cloud' ? '云端数据 · 所有同学可见' : '本地演示模式 · 数据只存在这台设备'}}</text>
       </view>
-      <view class="publish" bindtap="publish">发布</view>
+      <view class="publish" bindtap="openSheet">发布</view>
     </view>
 
     <view class="search">
@@ -15,35 +15,123 @@
     </view>
 
     <scroll-view scroll-x class="cats">
-      <view wx:for="{{categories}}" wx:key="id" data-id="{{item.id}}" bindtap="selectCategory" class="cat {{item.id === activeCategory ? 'cat-on' : ''}}">{{item.label}}</view>
+      <view
+        wx:for="{{categories}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="selectCategory"
+        class="cat {{item.id === activeCategory ? 'cat-on' : ''}}"
+      >{{item.label}}</view>
     </scroll-view>
   </view>
 
   <view class="feed">
     <view class="feed-head">
       <text class="feed-title">最新动态</text>
-      <text class="feed-count">{{postCount}} 条</text>
+      <text class="feed-count">{{posts.length}}{{hasMore ? '+' : ''}} 条</text>
     </view>
 
-    <view wx:for="{{filteredPosts}}" wx:key="id" class="post">
-      <view class="post-head">
-        <view class="avatar {{item.avatarTone}}">{{item.avatar}}</view>
-        <view class="post-meta">
-          <text class="post-name">{{item.author}}</text>
-          <text class="post-time">{{item.time}} · {{item.category}}</text>
+    <!-- 首次加载：骨架屏。比转圈更接近真实内容，视觉上不闪 -->
+    <view wx:if="{{loading}}" class="skeleton">
+      <view wx:for="{{[1,2,3]}}" wx:key="*this" class="sk-row">
+        <view class="sk-avatar"></view>
+        <view class="sk-lines">
+          <view class="sk-line sk-w30"></view>
+          <view class="sk-line sk-w90"></view>
+          <view class="sk-line sk-w60"></view>
         </view>
       </view>
-      <text class="post-content">{{item.content}}</text>
-      <view class="post-actions">
-        <text class="act {{item.liked ? 'act-on' : ''}}" data-id="{{item.id}}" bindtap="likePost">{{item.liked ? '已赞' : '赞'}} {{item.likes}}</text>
-        <text class="act">评论 {{item.comments}}</text>
-        <text class="detail">查看详情</text>
-      </view>
     </view>
 
-    <view wx:if="{{filteredPosts.length === 0}}" class="empty">
-      <text class="empty-title">没有找到相关动态</text>
-      <text class="empty-desc">换个关键词或分类试试</text>
+    <!-- 加载失败：必须告诉用户原因，并给一个重试入口 -->
+    <view wx:elif="{{error}}" class="state">
+      <text class="state-title">加载失败</text>
+      <text class="state-desc">{{error}}</text>
+      <view class="state-btn" bindtap="retry">重新加载</view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:elif="{{posts.length === 0}}" class="state">
+      <text class="state-title">{{keyword ? '没有找到相关动态' : '还没有动态'}}</text>
+      <text class="state-desc">{{keyword ? '换个关键词或分类试试' : '点右上角「发布」，说第一句话'}}</text>
+    </view>
+
+    <!-- 正常列表 -->
+    <block wx:else>
+      <view
+        wx:for="{{posts}}"
+        wx:key="id"
+        class="post"
+        data-id="{{item.id}}"
+        bindlongpress="onPostLongPress"
+      >
+        <view class="post-head">
+          <view class="avatar {{item.tone}}">{{item.initial}}</view>
+          <view class="post-meta">
+            <view class="post-name-row">
+              <text class="post-name">{{item.author}}</text>
+              <text wx:if="{{item.mine}}" class="mine-tag">我</text>
+            </view>
+            <text class="post-time">{{item.time}} · {{item.category}}</text>
+          </view>
+        </view>
+
+        <text class="post-content">{{item.content}}</text>
+
+        <view class="post-actions">
+          <text
+            class="act {{item.liked ? 'act-on' : ''}}"
+            data-id="{{item.id}}"
+            catchtap="likePost"
+          >{{item.liked ? '已赞' : '赞'}} {{item.likes}}</text>
+          <text wx:if="{{item.mine}}" class="act-tip">长按可删除</text>
+        </view>
+      </view>
+
+      <view class="footer">
+        <text wx:if="{{loadingMore}}">正在加载…</text>
+        <text wx:elif="{{hasMore}}">上拉加载更多</text>
+        <text wx:else>没有更多了</text>
+      </view>
+    </block>
+  </view>
+</view>
+
+<!-- 发布面板：遮罩 + 底部弹出 -->
+<view wx:if="{{sheetVisible}}" class="mask" bindtap="closeSheet"></view>
+<view wx:if="{{sheetVisible}}" class="sheet" catchtap="noop">
+  <view class="sheet-bar"></view>
+
+  <view class="sheet-head">
+    <text class="sheet-title">说点什么</text>
+    <text class="sheet-count">{{draftCount}}/500</text>
+  </view>
+
+  <textarea
+    class="sheet-input"
+    value="{{draft}}"
+    maxlength="500"
+    placeholder="分享校园里的小事…"
+    placeholder-class="ph"
+    auto-height
+    fixed
+    bindinput="onDraftInput"
+  />
+
+  <view class="sheet-cats">
+    <text
+      wx:for="{{publishCategories}}"
+      wx:key="id"
+      class="sheet-cat {{item.id === draftCategory ? 'sheet-cat-on' : ''}}"
+      data-name="{{item.id}}"
+      bindtap="pickDraftCategory"
+    >{{item.label}}</text>
+  </view>
+
+  <view class="sheet-actions">
+    <view class="sheet-btn ghost" bindtap="closeSheet">取消</view>
+    <view class="sheet-btn primary {{submitting ? 'is-disabled' : ''}}" bindtap="submitPost">
+      {{submitting ? '发布中…' : '发布'}}
     </view>
   </view>
 </view>
