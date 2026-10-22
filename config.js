@@ -23,6 +23,11 @@ const config = {
   // 未部署时会打警告并放行（fail-open）。正式上线应改为拦截（fail-close）。
   requireContentCheck: false,
 
+  // AI 问答。需要先部署 cloudfunctions/askCampus 并配好 LLM_API_KEY 环境变量。
+  // 只有 cloud 模式下才生效；没部署时问答会自动降级到本地知识库。
+  askFunction: 'askCampus',
+  useAI: true,
+
   schoolName: '嘉兴南洋职业技术学院',
   semesterStart: '2026-09-07',
   version: '3.0.0',

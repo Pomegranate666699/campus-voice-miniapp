@@ -31,6 +31,22 @@
 .send { display: flex; flex: none; align-items: center; justify-content: center; height: 60rpx; padding: 0 26rpx; border-radius: 8rpx; background: #1f6b5e; color: #fff; font-size: 24rpx; }
 
 .answer { margin-top: 20rpx; padding: 24rpx; }
+.answer-head { display: flex; align-items: center; justify-content: space-between; }
 .answer-label { font-size: 22rpx; color: #1f6b5e; }
+.answer-source { padding: 2rpx 10rpx; border-radius: 6rpx; background: #f0f1ec; font-size: 19rpx; color: #7d8581; }
+.answer-source.src-ai { background: #e6f0ed; color: #1f6b5e; }
 .answer-text { display: block; margin-top: 10rpx; font-size: 27rpx; line-height: 1.7; color: #2a302e; }
+
+.thinking { display: flex; align-items: center; margin-top: 14rpx; }
+.dot { width: 12rpx; height: 12rpx; margin-right: 8rpx; border-radius: 50%; background: #1f6b5e; opacity: .25; animation: dot-blink 1.2s infinite; }
+.d2 { animation-delay: .2s; }
+.d3 { animation-delay: .4s; }
+@keyframes dot-blink {
+  0%, 60%, 100% { opacity: .25; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-4rpx); }
+}
+.thinking-text { margin-left: 6rpx; font-size: 23rpx; color: #8b928e; }
+
+.degraded-tip { display: block; margin-top: 16rpx; padding-top: 14rpx; border-top: 1rpx solid #eef0ea; font-size: 20rpx; color: #b08a4a; }
+
 .footnote { display: block; margin-top: 28rpx; font-size: 20rpx; color: #9aa09c; text-align: center; }

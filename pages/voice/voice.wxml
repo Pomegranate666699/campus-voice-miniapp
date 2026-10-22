@@ -1,7 +1,7 @@
 <view class="page voice">
   <view class="page-head">
     <text class="page-title">语音问答</text>
-    <text class="page-sub">长按麦克风说话，松开自动识别</text>
+    <text class="page-sub">长按麦克风说话，松开自动识别 · AI 回答</text>
   </view>
 
   <view class="tabs">
@@ -33,9 +33,22 @@
   </view>
 
   <view wx:if="{{showResult}}" id="answer" class="answer card">
-    <text class="answer-label">校园助手</text>
-    <text class="answer-text">{{resultText}}</text>
+    <view class="answer-head">
+      <text class="answer-label">校园助手</text>
+      <text wx:if="{{sourceLabel}}" class="answer-source {{source === 'ai' ? 'src-ai' : ''}}">{{sourceLabel}}</text>
+    </view>
+
+    <view wx:if="{{thinking}}" class="thinking">
+      <view class="dot d1"></view>
+      <view class="dot d2"></view>
+      <view class="dot d3"></view>
+      <text class="thinking-text">正在思考…</text>
+    </view>
+
+    <text wx:else class="answer-text">{{resultText}}</text>
+
+    <text wx:if="{{degraded}}" class="degraded-tip">AI 暂时不可用，以上由本地知识库回答</text>
   </view>
 
-  <text class="footnote">演示数据 · 具体以学校最新通知为准</text>
+  <text class="footnote">AI 生成内容仅供参考 · 具体以学校最新通知为准</text>
 </view>

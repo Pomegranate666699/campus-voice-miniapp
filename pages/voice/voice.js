@@ -1,4 +1,4 @@
-const { answerFor, fallbackAnswer } = require('../../utils/campus-qa')
+const qa = require('../../services/qa')
 const history = require('../../services/history')
 
 let recorder = null
@@ -17,6 +17,10 @@ Page({
     question: '',
     showResult: false,
     resultText: '',
+    thinking: false,       // AI 思考中
+    source: '',            // ai / local / fallback
+    sourceLabel: '',
+    degraded: false,       // 是否因为 AI 失败而降级
     recording: false,
     recognizing: false,
     voiceTitle: '按住说话',
@@ -182,15 +186,55 @@ Page({
       wx.showToast({ title: '先输入一个问题', icon: 'none' })
       return
     }
-    const answer = answerFor(q) || fallbackAnswer
-    this.setData({ showResult: true, resultText: answer })
-    // 记一条历史，供「我的 → 问答记录」查看
-    history.add({ question: q, answer: answer })
-    if (wx.pageScrollTo) {
-      setTimeout(() => {
-        try { wx.pageScrollTo({ selector: '#answer', duration: 200, offsetTop: -20 }) } catch (e) {}
-      }, 80)
-    }
+
+    // 每次提问生成一个序号。如果用户在 AI 回答前又问了新问题，
+    // 旧请求回来时序号对不上，就直接丢掉，避免答案串台。
+    const token = (this.requestToken || 0) + 1
+    this.requestToken = token
+
+    this.setData({
+      showResult: true,
+      thinking: true,
+      resultText: '',
+      source: '',
+      sourceLabel: '',
+      degraded: false
+    })
+
+    const self = this
+
+    qa.ask(q)
+      .then(function (res) {
+        if (self.requestToken !== token) return
+        self.setData({
+          thinking: false,
+          resultText: res.answer,
+          source: res.source,
+          sourceLabel: qa.sourceLabel(res.source),
+          degraded: !!res.degraded
+        })
+        // 记一条历史，供「我的 → 问答记录」查看
+        history.add({ question: q, answer: res.answer })
+        self.scrollToAnswer()
+      })
+      .catch(function (err) {
+        if (self.requestToken !== token) return
+        self.setData({
+          thinking: false,
+          resultText: '抱歉，这个问题暂时回答不了：' + (err.message || '未知错误'),
+          source: '',
+          sourceLabel: ''
+        })
+      })
+  },
+
+  scrollToAnswer() {
+    if (!wx.pageScrollTo) return
+    setTimeout(function () {
+      try {
+        wx.pageScrollTo({ selector: '#answer', duration: 220, offsetTop: -20 })
+      } catch (e) {}
+    }, 80)
   },
 
   fillLibrary() { this.setData({ question: '图书馆开放时间' }) },
