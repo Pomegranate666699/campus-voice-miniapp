@@ -24,7 +24,10 @@ Page({
     recording: false,
     recognizing: false,
     voiceTitle: '按住说话',
-    voiceHint: '长按录音，松开发送'
+    voiceHint: '长按录音，松开发送',
+
+    activeTab: 'voice', // voice：麦克风；text：文字输入
+    inputFocus: false
   },
 
   onLoad(options) {
@@ -43,7 +46,7 @@ Page({
     const pending = app && app.globalData && app.globalData.pendingQuestion
     if (pending) {
       app.globalData.pendingQuestion = ''
-      this.setData({ question: pending })
+      this.setData({ question: pending, activeTab: 'text', inputFocus: true })
       const self = this
       setTimeout(function () {
         self.submit()
@@ -176,13 +179,20 @@ Page({
     this.setData({ question: e.detail.value })
   },
 
-  focusText() {
-    wx.showToast({ title: '直接在下方输入即可', icon: 'none' })
+  switchMode(e) {
+    const tab = (e && e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.tab) || 'voice'
+    if (tab === this.data.activeTab) return
+    this.setData({
+      activeTab: tab,
+      inputFocus: tab === 'text'
+    })
   },
 
   submit() {
     const q = (this.data.question || '').trim()
     if (!q) {
+      // 没输入内容时，直接切到文字 tab 并把光标放进去
+      this.setData({ activeTab: 'text', inputFocus: true })
       wx.showToast({ title: '先输入一个问题', icon: 'none' })
       return
     }
@@ -211,7 +221,8 @@ Page({
           resultText: res.answer,
           source: res.source,
           sourceLabel: qa.sourceLabel(res.source),
-          degraded: !!res.degraded
+          degraded: !!res.degraded,
+          inputFocus: false
         })
         // 记一条历史，供「我的 → 问答记录」查看
         history.add({ question: q, answer: res.answer })
@@ -237,7 +248,13 @@ Page({
     }, 80)
   },
 
-  fillLibrary() { this.setData({ question: '图书馆开放时间' }) },
-  fillCourse() { this.setData({ question: '今天有什么课' }) },
-  fillCanteen() { this.setData({ question: '食堂推荐' }) }
+  // 示例问句：填进去并直接提问，少一次点击
+  fillLibrary() { this.askPreset('图书馆开放时间') },
+  fillCourse() { this.askPreset('今天有什么课') },
+  fillCanteen() { this.askPreset('食堂推荐') },
+
+  askPreset(text) {
+    this.setData({ question: text, activeTab: 'text' })
+    this.submit()
+  }
 })
