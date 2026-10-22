@@ -20,7 +20,10 @@ const time = require('../utils/time')
 
 const COL_POSTS = 'posts'
 const COL_LIKES = 'likes'
+const COL_COMMENTS = 'comments'
 const CATEGORIES = ['日常', '校园活动', '失物招领', '二手集市']
+
+const COMMENT_PAGE_SIZE = 10
 
 /** 用户输入的关键词要转义，否则输入 "." 会把所有内容都匹配上 */
 function escapeRegExp(text) {
@@ -71,6 +74,52 @@ async function fetchLikes(ids, database) {
   return map
 }
 
+/** 集合还没建时，不应该让整个页面崩掉，按 0 处理 */
+function isMissingCollection(err) {
+  const message = (err && (err.errMsg || err.message)) || ''
+  return (err && err.errCode === -502005) || message.indexOf('collection not exists') >= 0
+}
+
+/** 读取一批帖子的评论数 */
+async function fetchCommentCounts(ids, database) {
+  const map = {}
+  try {
+    const _ = database.command
+    const res = await database
+      .collection(COL_COMMENTS)
+      .where({ postId: _.in(ids) })
+      .field({ postId: true })
+      .limit(100)
+      .get()
+
+    ;(res.data || []).forEach(function (item) {
+      if (!item.postId) return
+      map[item.postId] = (map[item.postId] || 0) + 1
+    })
+  } catch (err) {
+    if (!isMissingCollection(err)) {
+      console.warn('[cloud] 读取评论数失败，按 0 处理：', err)
+    }
+  }
+  return map
+}
+
+/** 把数据库里的评论转成页面能直接用的形状 */
+function commentToViewModel(doc, meId) {
+  return {
+    id: doc._id,
+    postId: doc.postId,
+    authorId: doc.authorId || '',
+    author: doc.author || '匿名同学',
+    initial: doc.initial || (doc.author || '同').charAt(0),
+    tone: doc.tone || '',
+    content: doc.content,
+    createdAt: time.toTimestamp(doc.createdAt),
+    time: time.fromNow(doc.createdAt),
+    mine: doc.authorId === meId
+  }
+}
+
 async function listPosts(options) {
   const opt = options || {}
   const page = Math.max(0, opt.page || 0)
@@ -108,7 +157,13 @@ async function listPosts(options) {
   const ids = docs.map(function (doc) {
     return doc._id
   })
-  const likesMap = await fetchLikes(ids, database)
+  // 点赞和评论数都要查，用 Promise.all 并行，别串行等两次
+  const results = await Promise.all([
+    fetchLikes(ids, database),
+    fetchCommentCounts(ids, database)
+  ])
+  const likesMap = results[0]
+  const commentCounts = results[1]
   const me = auth.getMe()
 
   const items = docs.map(function (doc) {
@@ -125,6 +180,7 @@ async function listPosts(options) {
       time: time.fromNow(doc.createdAt),
       likes: likedBy.length,
       liked: likedBy.indexOf(me.id) >= 0,
+      comments: commentCounts[doc._id] || 0,
       mine: doc.authorId === me.id
     }
   })
@@ -200,6 +256,11 @@ async function removePost(postId) {
     await database.collection(COL_LIKES).where({ postId: postId }).remove()
   } catch (e) {}
 
+  // 评论同理，否则会留下孤儿数据
+  try {
+    await database.collection(COL_COMMENTS).where({ postId: postId }).remove()
+  } catch (e) {}
+
   return true
 }
 
@@ -236,6 +297,143 @@ async function toggleLike(postId) {
   return { liked: liked, likes: counted.total || 0 }
 }
 
+/* ------------------------------ 单条与评论 ------------------------------ */
+
+async function getPost(postId) {
+  const me = auth.getMe()
+  const database = db()
+
+  let doc
+  try {
+    const res = await database.collection(COL_POSTS).doc(postId).get()
+    doc = res.data
+  } catch (err) {
+    throw new Error(friendlyError(err))
+  }
+
+  if (!doc) throw new Error('这条动态已经不存在了')
+
+  const results = await Promise.all([
+    fetchLikes([postId], database),
+    fetchCommentCounts([postId], database)
+  ])
+  const likedBy = results[0][postId] || []
+
+  return {
+    id: doc._id,
+    authorId: doc.authorId || '',
+    author: doc.author || '匿名同学',
+    initial: doc.initial || (doc.author || '同').charAt(0),
+    tone: doc.tone || '',
+    content: doc.content,
+    category: doc.category,
+    createdAt: time.toTimestamp(doc.createdAt),
+    time: time.fromNow(doc.createdAt),
+    likes: likedBy.length,
+    liked: likedBy.indexOf(me.id) >= 0,
+    comments: results[1][postId] || 0,
+    mine: doc.authorId === me.id
+  }
+}
+
+async function listComments(options) {
+  const opt = options || {}
+  const postId = String(opt.postId || '')
+  const page = Math.max(0, opt.page || 0)
+  const size = opt.size || COMMENT_PAGE_SIZE
+  const database = db()
+
+  let res
+  try {
+    res = await database
+      .collection(COL_COMMENTS)
+      .where({ postId: postId })
+      .orderBy('createdAt', 'desc')
+      .skip(page * size)
+      .limit(size)
+      .get()
+  } catch (err) {
+    // comments 集合还没建时，按"没有评论"处理，不要让详情页打不开
+    if (isMissingCollection(err)) {
+      return { items: [], hasMore: false, total: 0 }
+    }
+    throw new Error(friendlyError(err))
+  }
+
+  const me = auth.getMe()
+  const items = (res.data || []).map(function (doc) {
+    return commentToViewModel(doc, me.id)
+  })
+
+  return {
+    items: items,
+    hasMore: items.length === size,
+    total: page * size + items.length
+  }
+}
+
+async function addComment(input) {
+  const postId = String((input && input.postId) || '')
+  const content = String((input && input.content) || '').trim()
+
+  if (!postId) throw new Error('缺少动态 ID')
+  if (!content) throw new Error('说点什么再评论吧')
+
+  if (config.requireContentCheck) {
+    const passed = await checkContent(content)
+    if (!passed) throw new Error('评论含违规信息，请修改后再发')
+  }
+
+  const me = auth.getMe()
+  const database = db()
+  const createdAt = Date.now()
+
+  try {
+    const res = await database.collection(COL_COMMENTS).add({
+      data: {
+        postId: postId,
+        authorId: me.id,
+        author: me.nickname,
+        initial: me.initial || '同',
+        tone: me.tone || '',
+        content: content.slice(0, 200),
+        createdAt: createdAt
+      }
+    })
+
+    return {
+      id: res._id,
+      postId: postId,
+      authorId: me.id,
+      author: me.nickname,
+      initial: me.initial || '同',
+      tone: me.tone || '',
+      content: content.slice(0, 200),
+      createdAt: createdAt,
+      time: time.fromNow(createdAt),
+      mine: true
+    }
+  } catch (err) {
+    throw new Error(friendlyError(err))
+  }
+}
+
+async function removeComment(input) {
+  const commentId = String((input && input.commentId) || '')
+  if (!commentId) throw new Error('缺少评论 ID')
+
+  const database = db()
+  try {
+    // 和删帖一样：客户端删别人的会被权限规则直接拒绝
+    await database.collection(COL_COMMENTS).doc(commentId).remove()
+  } catch (err) {
+    throw new Error(friendlyError(err))
+  }
+  return true
+}
+
+/* ------------------------------ 统计 ------------------------------ */
+
 async function getMyStats() {
   const me = auth.getMe()
   const database = db()
@@ -243,15 +441,17 @@ async function getMyStats() {
   try {
     const results = await Promise.all([
       database.collection(COL_POSTS).where({ authorId: me.id }).count(),
-      database.collection(COL_LIKES).where({ authorId: me.id }).count()
+      database.collection(COL_LIKES).where({ authorId: me.id }).count(),
+      database.collection(COL_COMMENTS).where({ authorId: me.id }).count()
     ])
     return {
       posts: results[0].total || 0,
-      likes: results[1].total || 0
+      likes: results[1].total || 0,
+      comments: results[2].total || 0
     }
   } catch (err) {
     console.warn('[cloud] 统计数据读取失败：', err)
-    return { posts: 0, likes: 0 }
+    return { posts: 0, likes: 0, comments: 0 }
   }
 }
 
@@ -262,5 +462,9 @@ module.exports = {
   createPost: createPost,
   removePost: removePost,
   toggleLike: toggleLike,
+  getPost: getPost,
+  listComments: listComments,
+  addComment: addComment,
+  removeComment: removeComment,
   getMyStats: getMyStats
 }

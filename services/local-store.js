@@ -18,6 +18,9 @@ const time = require('../utils/time')
 
 const KEY_POSTS = 'cv_posts_v3'
 const KEY_LIKES = 'cv_likes_v3'
+const KEY_COMMENTS = 'cv_comments_v3'
+
+const COMMENT_PAGE_SIZE = 10
 
 // 故意加一点延迟，让"加载中"状态真的能被看到。
 // 真实网络请求本来就有延迟，本地模式假装一下，界面才不会"闪一下就出来"。
@@ -69,8 +72,42 @@ function buildSeed() {
   })
 }
 
-/* ------------------------------ 读写 ------------------------------ */
+/**
+ * 种子评论：按 postId 分组。
+ * 结构是 { seed_1: [评论, 评论], seed_2: [...] }，查某条动态的评论是 O(1)。
+ */
+function buildSeedComments() {
+  const now = Date.now()
+  const rows = [
+    ['seed_1', '陈同学', '陈', 'blue', '周六也去吗？想认识点新朋友', 4 * MINUTE],
+    ['seed_1', '周同学', '周', 'amber', '去年去过，挺热闹的', 2 * MINUTE],
+    ['seed_2', '林同学', '林', '', '好人一生平安', 9 * MINUTE],
+    ['seed_3', '赵同学', '赵', '', '教材是第几版的？', 30 * MINUTE],
+    ['seed_3', '周同学', '周', 'amber', '第二版，带光盘那个', 25 * MINUTE],
+    ['seed_4', '吴同学', '吴', '', '三楼西边那排更安静', 50 * MINUTE],
+    ['seed_5', '孙同学', '孙', '', '还缺人吗，我会一点', 2 * HOUR],
+    ['seed_8', '钱同学', '钱', 'blue', '多少寸的，多少钱？', 20 * HOUR]
+  ]
 
+  const map = {}
+  rows.forEach(function (row, index) {
+    const postId = row[0]
+    if (!map[postId]) map[postId] = []
+    map[postId].push({
+      id: 'sc_' + (index + 1),
+      postId: postId,
+      authorId: 'seed_c_' + (index + 1),
+      author: row[1],
+      initial: row[2],
+      tone: row[3],
+      content: row[4],
+      createdAt: now - row[5]
+    })
+  })
+  return map
+}
+
+/* ------------------------------ 读写 ------------------------------ */
 function readPosts() {
   try {
     const saved = wx.getStorageSync(KEY_POSTS)
@@ -102,14 +139,31 @@ function writeLikes(map) {
   } catch (e) {}
 }
 
+function readComments() {
+  try {
+    const saved = wx.getStorageSync(KEY_COMMENTS)
+    if (saved && typeof saved === 'object' && !Array.isArray(saved)) return saved
+  } catch (e) {}
+  const seeded = buildSeedComments()
+  writeComments(seeded)
+  return seeded
+}
+
+function writeComments(map) {
+  try {
+    wx.setStorageSync(KEY_COMMENTS, map)
+  } catch (e) {}
+}
+
 /* ------------------------------ 视图模型 ------------------------------ */
 
 /**
  * 把"存储里的数据"转成"页面直接能用的数据"。
  * 页面不应该自己算"这条我点过赞吗"，那是数据层的活。
  */
-function toViewModel(post, likesMap, meId) {
+function toViewModel(post, likesMap, commentsMap, meId) {
   const likedBy = likesMap[post.id] || []
+  const comments = commentsMap[post.id] || []
   return {
     id: post.id,
     authorId: post.authorId,
@@ -122,7 +176,23 @@ function toViewModel(post, likesMap, meId) {
     time: time.fromNow(post.createdAt),
     likes: likedBy.length,
     liked: likedBy.indexOf(meId) >= 0,
+    comments: comments.length,
     mine: post.authorId === meId
+  }
+}
+
+function commentToViewModel(comment, meId) {
+  return {
+    id: comment.id,
+    postId: comment.postId,
+    authorId: comment.authorId,
+    author: comment.author,
+    initial: comment.initial || '同',
+    tone: comment.tone || '',
+    content: comment.content,
+    createdAt: comment.createdAt,
+    time: time.fromNow(comment.createdAt),
+    mine: comment.authorId === meId
   }
 }
 
@@ -138,6 +208,7 @@ function listPosts(options) {
   return delay(LATENCY).then(function () {
     const me = auth.getMe()
     const likesMap = readLikes()
+    const commentsMap = readComments()
 
     const filtered = readPosts()
       .filter(function (post) {
@@ -155,7 +226,7 @@ function listPosts(options) {
 
     return {
       items: slice.map(function (post) {
-        return toViewModel(post, likesMap, me.id)
+        return toViewModel(post, likesMap, commentsMap, me.id)
       }),
       hasMore: start + size < filtered.length,
       total: filtered.length
@@ -184,7 +255,7 @@ function createPost(input) {
     }
 
     writePosts([post].concat(posts))
-    return toViewModel(post, readLikes(), me.id)
+    return toViewModel(post, readLikes(), readComments(), me.id)
   })
 }
 
@@ -207,6 +278,11 @@ function removePost(postId) {
     const likes = readLikes()
     delete likes[postId]
     writeLikes(likes)
+
+    // 帖子删了，它下面的评论也要一起清掉，否则会留下孤儿数据
+    const comments = readComments()
+    delete comments[postId]
+    writeComments(comments)
 
     return true
   })
@@ -240,7 +316,108 @@ function getMyStats() {
     if (map[postId].indexOf(me.id) >= 0) likes += 1
   })
 
-  return Promise.resolve({ posts: myPosts.length, likes: likes })
+  const comments = readComments()
+  let myComments = 0
+  Object.keys(comments).forEach(function (postId) {
+    comments[postId].forEach(function (comment) {
+      if (comment.authorId === me.id) myComments += 1
+    })
+  })
+
+  return Promise.resolve({ posts: myPosts.length, likes: likes, comments: myComments })
+}
+
+/* ------------------------------ 评论 ------------------------------ */
+
+function getPost(postId) {
+  return delay(Math.round(LATENCY / 2)).then(function () {
+    const me = auth.getMe()
+    const target = readPosts().filter(function (post) {
+      return post.id === postId
+    })[0]
+
+    if (!target) throw new Error('这条动态已经不存在了')
+    return toViewModel(target, readLikes(), readComments(), me.id)
+  })
+}
+
+function listComments(options) {
+  const opt = options || {}
+  const postId = String(opt.postId || '')
+  const page = Math.max(0, opt.page || 0)
+  const size = opt.size || COMMENT_PAGE_SIZE
+
+  return delay(Math.round(LATENCY / 2)).then(function () {
+    const me = auth.getMe()
+    const all = (readComments()[postId] || []).slice().sort(function (a, b) {
+      return b.createdAt - a.createdAt
+    })
+    const start = page * size
+
+    return {
+      items: all.slice(start, start + size).map(function (comment) {
+        return commentToViewModel(comment, me.id)
+      }),
+      hasMore: start + size < all.length,
+      total: all.length
+    }
+  })
+}
+
+function addComment(input) {
+  const postId = String((input && input.postId) || '')
+  const content = String((input && input.content) || '').trim()
+
+  return delay(Math.round(LATENCY / 2)).then(function () {
+    if (!postId) throw new Error('缺少动态 ID')
+    if (!content) throw new Error('说点什么再评论吧')
+
+    const me = auth.getMe()
+    const map = readComments()
+    const list = map[postId] || []
+
+    const comment = {
+      id: 'c_' + Date.now().toString(36),
+      postId: postId,
+      authorId: me.id,
+      author: me.nickname,
+      initial: me.initial || '同',
+      tone: me.tone || '',
+      content: content.slice(0, 200),
+      createdAt: Date.now()
+    }
+
+    // 新的放最前面，读取时天然就是倒序，不用每次排序
+    map[postId] = [comment].concat(list)
+    writeComments(map)
+
+    return commentToViewModel(comment, me.id)
+  })
+}
+
+function removeComment(input) {
+  const postId = String((input && input.postId) || '')
+  const commentId = String((input && input.commentId) || '')
+
+  return delay(Math.round(LATENCY / 2)).then(function () {
+    const me = auth.getMe()
+    const map = readComments()
+    const list = map[postId] || []
+    const target = list.filter(function (comment) {
+      return comment.id === commentId
+    })[0]
+
+    if (!target) throw new Error('这条评论已经不存在了')
+    // 前端判断只是体验，云端靠权限规则真正拦截
+    if (target.authorId !== me.id) throw new Error('只能删除自己的评论')
+
+    map[postId] = list.filter(function (comment) {
+      return comment.id !== commentId
+    })
+    writeComments(map)
+
+    return true
+  })
 }
 
 module.exports = {
@@ -250,5 +427,9 @@ module.exports = {
   createPost: createPost,
   removePost: removePost,
   toggleLike: toggleLike,
+  getPost: getPost,
+  listComments: listComments,
+  addComment: addComment,
+  removeComment: removeComment,
   getMyStats: getMyStats
 }
