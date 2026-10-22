@@ -164,6 +164,70 @@ async function main() {
     const stats = await store.getMyStats()
     assert.ok(stats.posts >= 1, '至少有一条自己发的')
     assert.strictEqual(typeof stats.likes, 'number')
+    assert.strictEqual(typeof stats.comments, 'number')
+  })
+
+  await test('详情页能读到评论数和评论列表', async () => {
+    const post = await store.getPost('seed_1')
+    assert.strictEqual(post.comments, 2)
+
+    const res = await store.listComments({ postId: 'seed_1', page: 0, size: 10 })
+    assert.strictEqual(res.items.length, 2)
+    assert.strictEqual(res.hasMore, false)
+  })
+
+  await test('发表评论后排在第一位，总数 +1', async () => {
+    const before = await store.listComments({ postId: 'seed_2', page: 0, size: 10 })
+    const created = await store.addComment({ postId: 'seed_2', content: '自测评论' })
+    const after = await store.listComments({ postId: 'seed_2', page: 0, size: 10 })
+
+    assert.strictEqual(after.total, before.total + 1)
+    assert.strictEqual(after.items[0].id, created.id)
+    assert.strictEqual(after.items[0].mine, true)
+  })
+
+  await test('空评论不允许发布', async () => {
+    let error = null
+    try {
+      await store.addComment({ postId: 'seed_2', content: '   ' })
+    } catch (err) {
+      error = err
+    }
+    assert.ok(error, '应该抛出错误')
+    assert.ok(error.message.indexOf('说点什么') >= 0)
+  })
+
+  await test('不能删除别人的评论', async () => {
+    const res = await store.listComments({ postId: 'seed_1', page: 0, size: 10 })
+    const others = res.items.filter((item) => !item.mine)
+    assert.ok(others.length > 0)
+
+    let error = null
+    try {
+      await store.removeComment({ postId: 'seed_1', commentId: others[0].id })
+    } catch (err) {
+      error = err
+    }
+    assert.ok(error, '应该拒绝删除别人的评论')
+    assert.ok(error.message.indexOf('只能删除自己') >= 0)
+  })
+
+  await test('能删除自己的评论', async () => {
+    const created = await store.addComment({ postId: 'seed_2', content: '待删评论' })
+    await store.removeComment({ postId: 'seed_2', commentId: created.id })
+
+    const res = await store.listComments({ postId: 'seed_2', page: 0, size: 10 })
+    const exists = res.items.some((item) => item.id === created.id)
+    assert.strictEqual(exists, false)
+  })
+
+  await test('删除动态会连带清掉它的评论', async () => {
+    const post = await store.createPost({ content: '带评论的动态', category: '日常' })
+    await store.addComment({ postId: post.id, content: '临时评论' })
+    await store.removePost(post.id)
+
+    const res = await store.listComments({ postId: post.id, page: 0, size: 10 })
+    assert.strictEqual(res.total, 0)
   })
 
   await test('昵称修改生效并写入本地', async () => {
