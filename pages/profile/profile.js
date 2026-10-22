@@ -8,7 +8,7 @@ Page({
     mode: config.mode,
     version: config.version,
     me: null,
-    stats: { posts: 0, likes: 0 },
+    stats: { posts: 0, likes: 0, comments: 0 },
     historyCount: 0
   },
 

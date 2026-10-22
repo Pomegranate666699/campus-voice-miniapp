@@ -43,6 +43,13 @@ Page({
   onShow() {
     const tabBar = this.getTabBar && this.getTabBar()
     if (tabBar) tabBar.setData({ selected: 3 })
+
+    // 从详情页评论/点赞回来时，数量和列表可能变了，刷新一下
+    const app = getApp()
+    if (app && app.globalData && app.globalData.wallDirty) {
+      app.globalData.wallDirty = false
+      this.reload()
+    }
   },
 
   onUnload() {
@@ -120,6 +127,12 @@ Page({
 
   retry() {
     this.reload()
+  },
+
+  openPost(e) {
+    const id = e.currentTarget.dataset.id
+    if (!id) return
+    wx.navigateTo({ url: '/pages/post/post?id=' + id })
   },
 
   /* ---------------------------- 搜索 / 筛选 ---------------------------- */

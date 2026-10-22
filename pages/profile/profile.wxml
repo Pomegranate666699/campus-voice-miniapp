@@ -13,6 +13,7 @@
 
   <view class="stats card">
     <view class="stat"><text class="stat-num">{{stats.posts}}</text><text class="stat-label">发布动态</text></view>
+    <view class="stat"><text class="stat-num">{{stats.comments}}</text><text class="stat-label">发表评论</text></view>
     <view class="stat"><text class="stat-num">{{stats.likes}}</text><text class="stat-label">点过的赞</text></view>
     <view class="stat"><text class="stat-num">{{historyCount}}</text><text class="stat-label">问答记录</text></view>
   </view>

@@ -63,6 +63,7 @@
         wx:key="id"
         class="post"
         data-id="{{item.id}}"
+        bindtap="openPost"
         bindlongpress="onPostLongPress"
       >
         <view class="post-head">
@@ -84,6 +85,11 @@
             data-id="{{item.id}}"
             catchtap="likePost"
           >{{item.liked ? '已赞' : '赞'}} {{item.likes}}</text>
+          <text
+            class="act"
+            data-id="{{item.id}}"
+            catchtap="openPost"
+          >评论 {{item.comments}}</text>
           <text wx:if="{{item.mine}}" class="act-tip">长按可删除</text>
         </view>
       </view>
