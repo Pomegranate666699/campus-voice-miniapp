@@ -31,6 +31,7 @@ global.wx = {
 const store = require(path.join(__dirname, '..', 'services', 'local-store'))
 const auth = require(path.join(__dirname, '..', 'services', 'auth'))
 const time = require(path.join(__dirname, '..', 'utils', 'time'))
+const qa = require(path.join(__dirname, '..', 'services', 'qa'))
 
 /* ---------------------- 2. 简易测试框架 ---------------------- */
 
@@ -179,6 +180,30 @@ async function main() {
     assert.strictEqual(time.fromNow(now - 3 * 60 * 60 * 1000), '3 小时前')
     assert.strictEqual(time.fromNow(now - 2 * 24 * 60 * 60 * 1000), '2 天前')
     assert.strictEqual(time.fromNow(null), '')
+  })
+
+  await test('本地模式下问答命中知识库', async () => {
+    const res = await qa.ask('图书馆开放时间')
+    assert.strictEqual(res.source, 'local')
+    assert.ok(res.answer.indexOf('图书馆') >= 0, '答案应该提到图书馆')
+    assert.strictEqual(res.degraded, false)
+  })
+
+  await test('知识库没收录时返回兜底提示，而不是报错', async () => {
+    const res = await qa.ask('量子纠缠和相对论有什么关系')
+    assert.strictEqual(res.source, 'fallback')
+    assert.ok(res.answer.length > 0)
+  })
+
+  await test('空问题直接返回空答案，不发请求', async () => {
+    const res = await qa.ask('   ')
+    assert.strictEqual(res.answer, '')
+  })
+
+  await test('问答来源标识可读', () => {
+    assert.strictEqual(qa.sourceLabel('ai'), 'AI 生成')
+    assert.strictEqual(qa.sourceLabel('local'), '本地知识库')
+    assert.strictEqual(qa.sourceLabel('fallback'), '兜底提示')
   })
 
   console.log('\n结果：' + passed + ' 通过，' + failed + ' 失败\n')
