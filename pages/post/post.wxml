@@ -1,0 +1,85 @@
+<view class="post-page">
+  <view wx:if="{{loading}}" class="state">
+    <text class="state-desc">加载中…</text>
+  </view>
+
+  <view wx:elif="{{error && !post}}" class="state">
+    <text class="state-title">加载失败</text>
+    <text class="state-desc">{{error}}</text>
+    <view class="state-btn" bindtap="retry">重新加载</view>
+  </view>
+
+  <block wx:else>
+    <!-- 动态正文 -->
+    <view class="detail card">
+      <view class="detail-head">
+        <view class="avatar {{post.tone}}">{{post.initial}}</view>
+        <view class="detail-meta">
+          <text class="detail-name">{{post.author}}</text>
+          <text class="detail-time">{{post.time}} · {{post.category}}</text>
+        </view>
+      </view>
+
+      <text class="detail-content">{{post.content}}</text>
+
+      <view class="detail-actions">
+        <text class="act {{post.liked ? 'act-on' : ''}}" bindtap="likePost">{{post.liked ? '已赞' : '赞'}} {{post.likes}}</text>
+        <text class="act">评论 {{commentTotal}}</text>
+      </view>
+    </view>
+
+    <!-- 评论区 -->
+    <view class="comments-head">
+      <text class="comments-title">全部评论</text>
+      <text class="comments-count">{{commentTotal}}</text>
+    </view>
+
+    <view wx:if="{{comments.length === 0}}" class="state">
+      <text class="state-title">还没有评论</text>
+      <text class="state-desc">来做第一个留言的人</text>
+    </view>
+
+    <view wx:else class="comment-list">
+      <view
+        wx:for="{{comments}}"
+        wx:key="id"
+        class="comment"
+        data-id="{{item.id}}"
+        bindlongpress="onCommentLongPress"
+      >
+        <view class="avatar sm {{item.tone}}">{{item.initial}}</view>
+        <view class="comment-body">
+          <view class="comment-head">
+            <text class="comment-name">{{item.author}}</text>
+            <text wx:if="{{item.mine}}" class="mine-tag">我</text>
+            <text class="comment-time">{{item.time}}</text>
+          </view>
+          <text class="comment-text">{{item.content}}</text>
+        </view>
+      </view>
+
+      <view class="footer">
+        <text wx:if="{{loadingMore}}">正在加载…</text>
+        <text wx:elif="{{hasMore}}">上拉加载更多</text>
+        <text wx:else>没有更多了</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 底部输入框 -->
+  <view wx:if="{{post}}" class="composer">
+    <input
+      class="composer-input"
+      value="{{draft}}"
+      maxlength="200"
+      placeholder="说点友善的话…"
+      placeholder-class="ph"
+      confirm-type="send"
+      bindinput="onDraftInput"
+      bindconfirm="submitComment"
+    />
+    <view class="composer-btn {{sending ? 'is-disabled' : ''}}" bindtap="submitComment">
+      {{sending ? '发送中' : '发送'}}
+    </view>
+  </view>
+</view>
