@@ -1,0 +1,9 @@
+{
+  "name": "askCampus",
+  "version": "1.0.0",
+  "description": "AI 校园问答（转发大模型请求）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
