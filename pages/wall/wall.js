@@ -249,7 +249,20 @@ Page({
 
   /* ---------------------------- 发布 ---------------------------- */
 
+  /**
+   * 控制底部 tabBar 显隐。
+   * 自定义 tabBar 在小程序里的层级高于页面内所有 fixed 元素，z-index 盖不过它，
+   * 所以弹出面板时必须把它整体藏起来，否则面板底部的按钮会被压在下面。
+   */
+  setTabBarHidden(hidden) {
+    const tabBar = this.getTabBar && this.getTabBar()
+    if (tabBar && tabBar.setData) {
+      tabBar.setData({ hidden: !!hidden })
+    }
+  },
+
   openSheet() {
+    this.setTabBarHidden(true)
     this.setData({
       sheetVisible: true,
       draft: '',
@@ -260,6 +273,7 @@ Page({
 
   closeSheet() {
     if (this.data.submitting) return
+    this.setTabBarHidden(false)
     this.setData({ sheetVisible: false })
   },
 
@@ -295,6 +309,7 @@ Page({
           draft: '',
           draftCount: 0
         })
+        self.setTabBarHidden(false)
         wx.showToast({ title: '发布成功', icon: 'success' })
         return self.reload()
       })

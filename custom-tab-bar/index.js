@@ -1,5 +1,5 @@
 Component({
-  data:{selected:0,list:[
+  data:{selected:0,hidden:false,list:[
     {pagePath:'pages/index/index',text:'首页',iconPath:'/assets/home-normal.png',selectedIconPath:'/assets/home-selected.png'},
     {pagePath:'pages/course/course',text:'课程',iconPath:'/assets/course-normal.png',selectedIconPath:'/assets/course-selected.png'},
     {pagePath:'pages/voice/voice',text:'语音',iconPath:'/assets/voice-normal.png',selectedIconPath:'/assets/voice-selected.png'},

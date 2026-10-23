@@ -1,4 +1,6 @@
 .custom-tabbar { position: fixed; z-index: 999; left: 0; right: 0; bottom: 0; height: 132rpx; padding-bottom: env(safe-area-inset-bottom); box-sizing: content-box; display: flex; align-items: stretch; background: #fff; border-top: 1rpx solid #e4e5df; }
+/* 弹层打开时隐藏整条 tabBar：它能盖住页面里的 fixed 元素，只能整体藏起来 */
+.custom-tabbar.is-hidden { display: none; }
 
 .tab-item { position: relative; flex: 1; height: 132rpx; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 14rpx; box-sizing: border-box; color: #8a9c97; font-size: 20rpx; }
 .icon-box { width: 50rpx; height: 50rpx; display: flex; align-items: center; justify-content: center; margin-bottom: 8rpx; }
