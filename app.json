@@ -20,6 +20,12 @@
       "desc": "用于语音问答，将你的校园问题转换为文字"
     }
   },
+  "plugins": {
+    "WechatSI": {
+      "version": "0.3.5",
+      "provider": "wx069ba97219f66d99"
+    }
+  },
   "tabBar": {
     "color": "#8a9c97",
     "selectedColor": "#1f7666",
