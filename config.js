@@ -19,9 +19,9 @@ const config = {
   // 自动推导模式：填了环境 ID 就是云端，没填就是本地
   mode: CLOUD_ENV ? 'cloud' : 'local',
 
-  // 内容安全检测。需要先部署 cloudfunctions/msgSecCheck
-  // 未部署时会打警告并放行（fail-open）。正式上线应改为拦截（fail-close）。
-  requireContentCheck: false,
+  // 内容安全检测。需要先部署 cloudfunctions/msgSecCheck 并配好 WX_APPID / WX_SECRET
+  // 未配置时会打警告并放行（fail-open）。正式上线应改为拦截（fail-close）。
+  requireContentCheck: true,
 
   // AI 问答。需要先部署 cloudfunctions/askCampus 并配好 LLM_API_KEY 环境变量。
   // 只有 cloud 模式下才生效；没部署时问答会自动降级到本地知识库。
