@@ -12,13 +12,14 @@
 .detail-time { margin-top: 4rpx; font-size: 21rpx; color: #9aa09c; }
 .detail-content { display: block; margin-top: 20rpx; font-size: 29rpx; line-height: 1.7; color: #2a302e; }
 .detail-actions { display: flex; align-items: center; margin-top: 22rpx; padding-top: 18rpx; border-top: 1rpx solid #eef0ea; }
-.act { margin-right: 44rpx; font-size: 24rpx; color: #6c7571; }
+/* 点赞、评论统一字号 / 行高 / 颜色，与列表页保持一致 */
+.act { margin-right: 40rpx; font-size: 24rpx; line-height: 34rpx; color: #6c7571; }
 .act-on { color: #1f6b5e; }
 
 /* ---------- 点赞（爱心图标） ---------- */
-.act-like { display: flex; align-items: center; margin-right: 44rpx; }
-.like-icon { width: 36rpx; height: 36rpx; margin-right: 8rpx; }
-.like-count { font-size: 24rpx; color: #6c7571; }
+.act-like { display: flex; align-items: center; margin-right: 40rpx; }
+.like-icon { width: 32rpx; height: 32rpx; margin-right: 6rpx; }
+.like-count { font-size: 24rpx; line-height: 34rpx; color: #6c7571; }
 .act-like.is-liked .like-count { color: #f5455c; }
 
 /* ---------- 评论区 ---------- */
