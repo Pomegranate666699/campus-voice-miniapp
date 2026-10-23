@@ -32,6 +32,7 @@ const store = require(path.join(__dirname, '..', 'services', 'local-store'))
 const auth = require(path.join(__dirname, '..', 'services', 'auth'))
 const time = require(path.join(__dirname, '..', 'utils', 'time'))
 const qa = require(path.join(__dirname, '..', 'services', 'qa'))
+const config = require(path.join(__dirname, '..', 'config'))
 
 /* ---------------------- 2. 简易测试框架 ---------------------- */
 
@@ -246,6 +247,10 @@ async function main() {
     assert.strictEqual(time.fromNow(null), '')
   })
 
+  // 问答相关的用例固定跑在本地模式，避免受 config.js 里 CLOUD_ENV 的影响。
+  // qa.ask 是在调用时读 config.mode 的，所以这里改运行时值就能生效。
+  config.mode = 'local'
+
   await test('本地模式下问答命中知识库', async () => {
     const res = await qa.ask('图书馆开放时间')
     assert.strictEqual(res.source, 'local')
@@ -257,6 +262,16 @@ async function main() {
     const res = await qa.ask('量子纠缠和相对论有什么关系')
     assert.strictEqual(res.source, 'fallback')
     assert.ok(res.answer.length > 0)
+  })
+
+  await test('云端模式下云开发不可用，自动降级到本地知识库', async () => {
+    config.mode = 'cloud'
+
+    const res = await qa.ask('图书馆开放时间')
+    assert.strictEqual(res.degraded, true, '应该标记为降级')
+    assert.ok(res.answer.length > 0, '降级后仍然要有答案')
+
+    config.mode = 'local'
   })
 
   await test('空问题直接返回空答案，不发请求', async () => {
