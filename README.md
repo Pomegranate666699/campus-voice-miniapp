@@ -281,3 +281,6 @@ node scripts/selftest.js
 6. **云函数请求没设超时**：大模型响应慢的时候请求一直挂着，把实例耗死。加了 `timeout` 和 `req.destroy()`。
 7. **第一版把 API Key 写在前端**：调试方便，但等于公开泄露。改成云函数环境变量才安全。
 8. **删帖没清评论**：动态删了但评论还在库里，成了查不出来的孤儿数据，后来补了级联清理。
+9. **自定义 tabBar 盖住弹层**：发布面板的按钮被底部导航栏压住，调 `z-index` 无效——自定义 tabBar 的层级由框架控制，页面内的 `fixed` 元素超不过它。最后改成弹出面板时把 tabBar 整体隐藏，关闭时恢复。
+10. **云调用拿不到 access_token**：`cloud.openapi` 一直报 `-501001 invalid wx openapi access_token`，属于环境侧问题。改成用 `appid + secret` 自己换 token 并缓存，绕开平台代管的链路。
+11. **单测依赖运行环境**：`config.js` 切成云端模式后，问答用例因为 Node 里没有 `wx.cloud` 全线失败。改成在用例里固定 `config.mode`，并补了一条"云端不可用时降级"的用例。
