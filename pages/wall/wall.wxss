@@ -57,11 +57,16 @@
 .footer { padding: 30rpx 0 40rpx; text-align: center; font-size: 22rpx; color: #a2a8a4; }
 
 /* ---------- 发布面板 ---------- */
-.mask { position: fixed; left: 0; right: 0; top: 0; bottom: 0; background: rgba(0, 0, 0, 0.38); z-index: 100; }
+/*
+ * 注意 z-index：自定义 tabBar 用的是 999（见 custom-tab-bar/index.wxss），
+ * 任何盖在页面上的浮层都必须比它大，否则会被底部导航栏压住。
+ */
+.mask { position: fixed; left: 0; right: 0; top: 0; bottom: 0; background: rgba(0, 0, 0, 0.38); z-index: 1000; }
 .sheet {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 101;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 1001;
   padding: 20rpx 32rpx calc(32rpx + env(safe-area-inset-bottom));
   background: #fff; border-radius: 24rpx 24rpx 0 0;
+  box-sizing: border-box;
 }
 .sheet-bar { width: 64rpx; height: 8rpx; margin: 0 auto 20rpx; border-radius: 4rpx; background: #e0e2dc; }
 .sheet-head { display: flex; align-items: baseline; justify-content: space-between; }
