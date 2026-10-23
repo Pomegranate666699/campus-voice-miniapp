@@ -11,7 +11,7 @@
  *
  * 把下面 CLOUD_ENV 填成你的云环境 ID，就自动切换到 cloud 模式。
  */
-const CLOUD_ENV = '' // TODO 在开发者工具「云开发」控制台复制环境 ID，填到这里
+const CLOUD_ENV = 'cloud1-8grbeusecc6e048b' // TODO 在开发者工具「云开发」控制台复制环境 ID，填到这里
 
 const config = {
   cloudEnv: CLOUD_ENV,
