@@ -80,11 +80,14 @@
         <text class="post-content">{{item.content}}</text>
 
         <view class="post-actions">
-          <text
-            class="act {{item.liked ? 'act-on' : ''}}"
+          <view
+            class="act-like {{item.liked ? 'is-liked' : ''}}"
             data-id="{{item.id}}"
             catchtap="likePost"
-          >{{item.liked ? '已赞' : '赞'}} {{item.likes}}</text>
+          >
+            <image class="like-icon" src="{{item.liked ? '/assets/liked.png' : '/assets/like.png'}}" mode="aspectFit" />
+            <text class="like-count">{{item.likes}}</text>
+          </view>
           <text
             class="act"
             data-id="{{item.id}}"

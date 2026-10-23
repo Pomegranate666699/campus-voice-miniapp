@@ -37,6 +37,12 @@
 .act-tip { margin-left: auto; font-size: 20rpx; color: #b4b9b5; }
 .detail { margin-left: auto; font-size: 23rpx; color: #9aa09c; }
 
+/* ---------- 点赞（爱心图标） ---------- */
+.act-like { display: flex; align-items: center; margin-right: 40rpx; }
+.like-icon { width: 34rpx; height: 34rpx; margin-right: 8rpx; }
+.like-count { font-size: 23rpx; color: #6c7571; }
+.act-like.is-liked .like-count { color: #f5455c; }
+
 /* ---------- 空状态 / 错误状态 ---------- */
 .state { display: flex; flex-direction: column; align-items: center; padding: 90rpx 48rpx; }
 .state-title { font-size: 28rpx; color: #3a403d; }

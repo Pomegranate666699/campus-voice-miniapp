@@ -15,6 +15,12 @@
 .act { margin-right: 44rpx; font-size: 24rpx; color: #6c7571; }
 .act-on { color: #1f6b5e; }
 
+/* ---------- 点赞（爱心图标） ---------- */
+.act-like { display: flex; align-items: center; margin-right: 44rpx; }
+.like-icon { width: 36rpx; height: 36rpx; margin-right: 8rpx; }
+.like-count { font-size: 24rpx; color: #6c7571; }
+.act-like.is-liked .like-count { color: #f5455c; }
+
 /* ---------- 评论区 ---------- */
 .comments-head { display: flex; align-items: baseline; margin: 34rpx 2rpx 12rpx; }
 .comments-title { font-size: 30rpx; font-weight: 600; color: #1c1e1d; }

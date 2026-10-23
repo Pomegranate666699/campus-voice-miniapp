@@ -23,7 +23,10 @@
       <text class="detail-content">{{post.content}}</text>
 
       <view class="detail-actions">
-        <text class="act {{post.liked ? 'act-on' : ''}}" bindtap="likePost">{{post.liked ? '已赞' : '赞'}} {{post.likes}}</text>
+        <view class="act-like {{post.liked ? 'is-liked' : ''}}" bindtap="likePost">
+          <image class="like-icon" src="{{post.liked ? '/assets/liked.png' : '/assets/like.png'}}" mode="aspectFit" />
+          <text class="like-count">{{post.likes}}</text>
+        </view>
         <text class="act">评论 {{commentTotal}}</text>
       </view>
     </view>
