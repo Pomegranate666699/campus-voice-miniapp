@@ -1,11 +1,31 @@
 .course { background: #f2f2ee; }
 
+/* ---------- 周切换 ---------- */
+.week-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18rpx; }
+.week-arrow {
+  width: 64rpx; height: 64rpx; line-height: 60rpx; text-align: center;
+  border: 1rpx solid #e4e5df; border-radius: 50%; background: #fff;
+  color: #1f6b5e; font-size: 36rpx;
+}
+.week-arrow.is-disabled { color: #cfd4cf; }
+.week-current { display: flex; flex-direction: column; align-items: center; }
+.week-no { font-size: 27rpx; font-weight: 600; color: #1c1e1d; }
+.week-range { margin-top: 2rpx; font-size: 21rpx; color: #8b928e; }
+.back-today {
+  align-self: center; margin-bottom: 16rpx; padding: 8rpx 26rpx;
+  border: 1rpx solid #1f6b5e; border-radius: 30rpx;
+  font-size: 22rpx; color: #1f6b5e;
+}
+
 .days { display: flex; justify-content: space-between; padding: 12rpx; }
-.day { width: 86rpx; height: 100rpx; border-radius: 10rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #5f6764; }
+.day { position: relative; width: 86rpx; height: 100rpx; border-radius: 10rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #5f6764; }
 .day-name { font-size: 21rpx; }
 .day-date { margin-top: 6rpx; font-size: 21rpx; }
 .day-selected { background: #1f6b5e; color: #fff; }
 .day-selected .day-name, .day-selected .day-date { color: #fff; }
+.today-dot { position: absolute; bottom: 8rpx; width: 8rpx; height: 8rpx; border-radius: 50%; background: #1f6b5e; }
+.day-selected .today-dot { background: #fff; }
+.today-tag { font-size: 21rpx; color: #1f6b5e; }
 
 .day-head { display: flex; align-items: flex-end; justify-content: space-between; margin: 32rpx 2rpx 14rpx; }
 .day-head-text { display: flex; align-items: baseline; }

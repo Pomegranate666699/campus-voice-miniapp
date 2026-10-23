@@ -1,13 +1,34 @@
 <view class="page course">
   <view class="page-head">
     <text class="page-title">课程安排</text>
-    <text class="page-sub">2026 秋季学期 · 第 {{week}} 周</text>
+    <text class="page-sub">2026 秋季学期 · {{weekRange}}</text>
   </view>
 
+  <!-- 周切换：前后各可翻一年 -->
+  <view class="week-nav">
+    <view class="week-arrow {{canPrev ? '' : 'is-disabled'}}" bindtap="prevWeek">‹</view>
+
+    <view class="week-current">
+      <text class="week-no">{{weekText}}</text>
+      <text class="week-range">{{weekRange}}</text>
+    </view>
+
+    <view class="week-arrow {{canNext ? '' : 'is-disabled'}}" bindtap="nextWeek">›</view>
+  </view>
+
+  <view wx:if="{{!isThisWeek}}" class="back-today" bindtap="chooseToday">回到本周</view>
+
   <view class="days card">
-    <view wx:for="{{days}}" wx:key="label" class="day {{item.selectedClass}}" data-index="{{index}}" bindtap="selectDay">
+    <view
+      wx:for="{{days}}"
+      wx:key="label"
+      class="day {{item.selectedClass}}"
+      data-index="{{index}}"
+      bindtap="selectDay"
+    >
       <text class="day-name">{{item.label}}</text>
       <text class="day-date">{{item.date}}</text>
+      <view wx:if="{{item.isToday}}" class="today-dot"></view>
     </view>
   </view>
 
@@ -16,7 +37,7 @@
       <text class="day-title">{{selectedDay}}</text>
       <text class="day-count">{{courseCount}} 节课</text>
     </view>
-    <text class="today" bindtap="chooseToday">回到今天</text>
+    <text wx:if="{{isThisWeek}}" class="today-tag">本周</text>
   </view>
 
   <view class="schedule card" wx:if="{{courseCount > 0}}">
@@ -35,7 +56,7 @@
   </view>
 
   <view class="empty" wx:if="{{courseCount === 0}}">
-    <text class="empty-title">今天没有课程安排</text>
+    <text class="empty-title">这天没有课程安排</text>
     <text class="empty-desc">可以去图书馆，或者留一点时间给自己。</text>
   </view>
 
