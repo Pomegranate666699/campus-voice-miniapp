@@ -107,10 +107,25 @@ const CLOUD_ENV = 'campus-voice-1a2b3c' // ← 填你的
 
 ### 第 5 步：（可选）部署内容安全云函数
 
-1. 右键 `cloudfunctions/msgSecCheck` →「上传并部署：云端安装依赖」
-2. 部署成功后，把 `config.js` 里的 `requireContentCheck` 改成 `true`
+这个函数**不用云调用**，而是自己用 `appid + secret` 换 `access_token`，链路完全自控。
+
+1. 到 mp.weixin.qq.com → 开发管理 → 开发设置 → 生成 **AppSecret**（只显示一次，记好）
+2. 右键 `cloudfunctions/msgSecCheck` →「上传并部署：云端安装依赖」
+3. 云函数 → `msgSecCheck` → 配置 → 环境变量，新增：
+
+| 变量名 | 值 |
+|---|---|
+| `WX_APPID` | 小程序 AppID |
+| `WX_SECRET` | 上面生成的 AppSecret |
+
+4. 保存后把 `config.js` 里的 `requireContentCheck` 改成 `true`
+
+> ⚠️ **AppSecret 泄露等于小程序被接管**，只能放云函数环境变量，绝不进前端和 Git。
+> 重置 AppSecret 会让旧的在其他系统里同时失效。
 
 没部署也能跑，只是不会做内容检测（控制台会有警告）。
+
+在控制台用「云端测试」时返回 `tokenOk: true` + “缺少 openid”是**正常**的——控制台没有用户身份，真正的检测要在小程序里发帖才会触发。
 
 ### 第 6 步：部署 AI 问答（可选，但这是简历上最亮的点）
 
