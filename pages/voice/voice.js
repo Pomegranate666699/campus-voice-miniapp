@@ -27,7 +27,8 @@ Page({
     voiceHint: '长按录音，松开发送',
 
     activeTab: 'voice', // voice：麦克风；text：文字输入
-    inputFocus: false
+    inputFocus: false,
+    voiceText: ''       // 语音识别出来的文字，只在语音 tab 展示
   },
 
   onLoad(options) {
@@ -68,7 +69,15 @@ Page({
   setupRecorder() {
     if (!recorder) return
     recorder.onStart = () => {
+      this.starting = false
       this.setVoiceState(true, false, '正在听…', '松开发送')
+
+      // 手指在权限回调返回之前就抬起来了：现在才真正开始录，那就立刻结束。
+      // 不处理的话会变成"点一下开始、再点一下才停"的诡异交互。
+      if (this.releasePending) {
+        this.releasePending = false
+        this.onVoiceEnd()
+      }
     }
     recorder.onStop = (res) => {
       if (this.unloaded) return
@@ -81,8 +90,9 @@ Page({
         wx.showToast({ title: '没听清，再说一次', icon: 'none' })
         return
       }
-      this.setData({ question: text })
-      this.submit()
+      // 识别结果留在语音 tab，不再写进文字输入框
+      this.setData({ voiceText: text, activeTab: 'voice' })
+      this.submit(text)
     }
     recorder.onError = (err) => {
       if (this.unloaded) return
@@ -106,12 +116,16 @@ Page({
       })
       return
     }
-    if (this.data.recording || this.data.recognizing) return
+    if (this.data.recording || this.data.recognizing || this.starting) return
     this.cancelled = false
+    this.releasePending = false
+    this.starting = true
+
     wx.getSetting({
       success: (res) => {
         const auth = res.authSetting || {}
         if (auth['scope.record'] === false) {
+          this.starting = false
           this.askOpenSetting()
         } else if (auth['scope.record']) {
           this.startRecord()
@@ -119,7 +133,10 @@ Page({
           wx.authorize({
             scope: 'scope.record',
             success: () => this.startRecord(),
-            fail: () => this.askOpenSetting()
+            fail: () => {
+              this.starting = false
+              this.askOpenSetting()
+            }
           })
         }
       },
@@ -144,8 +161,18 @@ Page({
   },
 
   startRecord() {
-    if (!recorder) return
+    if (!recorder) {
+      this.starting = false
+      return
+    }
     this.setVoiceState(true, false, '正在听…', '松开发送')
+
+    // 兜底：万一 onStart 没回调，也不能让按钮一直处于"启动中"状态
+    const self = this
+    setTimeout(function () {
+      self.starting = false
+    }, 1500)
+
     try {
       if (wx.vibrateShort) wx.vibrateShort({ type: 'light' })
     } catch (e) {}
@@ -153,12 +180,18 @@ Page({
       recorder.start({ duration: 30000, lang: 'zh_CN' })
     } catch (e) {
       console.error(e)
+      this.starting = false
       this.setVoiceState(false, false, '按住说话', '长按录音，松开发送')
       wx.showToast({ title: '录音启动失败，请重试', icon: 'none' })
     }
   },
 
   onVoiceEnd() {
+    // 还在等权限回调，录音尚未开始：记下来，等 onStart 后立刻结束
+    if (this.starting && !this.data.recording) {
+      this.releasePending = true
+      return
+    }
     if (!this.data.recording) return
     this.setVoiceState(false, true, '正在识别…', '稍等一下')
     try {
@@ -188,11 +221,16 @@ Page({
     })
   },
 
-  submit() {
-    const q = (this.data.question || '').trim()
+  submit(text) {
+    // 语音提问时会显式传入识别结果；文字输入框触发时不传（或传入事件对象）。
+    const fromVoice = typeof text === 'string'
+    const q = String(fromVoice ? text : (this.data.question || '')).trim()
+
     if (!q) {
-      // 没输入内容时，直接切到文字 tab 并把光标放进去
-      this.setData({ activeTab: 'text', inputFocus: true })
+      // 只有从文字输入框触发时，才把用户引到文字 tab
+      if (!fromVoice) {
+        this.setData({ activeTab: 'text', inputFocus: true })
+      }
       wx.showToast({ title: '先输入一个问题', icon: 'none' })
       return
     }

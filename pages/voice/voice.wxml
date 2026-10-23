@@ -21,6 +21,12 @@
       <text class="mic-hint">{{voiceHint}}</text>
     </view>
 
+    <!-- 识别结果只在这里展示，不再写进文字输入框 -->
+    <view wx:if="{{voiceText}}" class="voice-heard">
+      <text class="voice-heard-label">识别到</text>
+      <text class="voice-heard-text">{{voiceText}}</text>
+    </view>
+
     <view class="switch-tip" data-tab="text" bindtap="switchMode">
       <text class="switch-tip-text">不方便说话？切换到文字输入</text>
       <text class="chev">›</text>

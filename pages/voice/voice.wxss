@@ -10,6 +10,10 @@
 .switch-tip { display: flex; align-items: center; justify-content: space-between; margin-top: 20rpx; padding: 24rpx; border: 1rpx dashed #d6d9d2; border-radius: 12rpx; }
 .switch-tip-text { font-size: 23rpx; color: #6c7571; }
 
+.voice-heard { display: flex; align-items: baseline; margin-top: 20rpx; padding: 22rpx 24rpx; border-left: 6rpx solid #1f6b5e; border-radius: 8rpx; background: #fff; }
+.voice-heard-label { flex: none; margin-right: 16rpx; font-size: 20rpx; color: #1f6b5e; }
+.voice-heard-text { flex: 1; min-width: 0; font-size: 27rpx; line-height: 1.5; color: #2a302e; }
+
 .mic-btn { display: flex; align-items: center; justify-content: center; width: 132rpx; height: 132rpx; border-radius: 50%; background: #1f6b5e; transition: transform .12s ease, box-shadow .2s ease; }
 .mic-active .mic-btn { box-shadow: 0 0 0 14rpx rgba(31, 107, 94, .10); animation: mic-pulse 1.2s ease-in-out infinite; }
 .mic-active .mic-title { color: #1f6b5e; }
