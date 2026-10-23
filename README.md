@@ -127,7 +127,7 @@ const CLOUD_ENV = 'campus-voice-1a2b3c' // ← 填你的
 
 在控制台用「云端测试」时返回 `tokenOk: true` + “缺少 openid”是**正常**的——控制台没有用户身份，真正的检测要在小程序里发帖才会触发。
 
-### 第 6 步：部署 AI 问答（可选，但这是简历上最亮的点）
+### 第 6 步：部署 AI 问答
 
 1. 到 DeepSeek 开放平台（或任意兼容 OpenAI 协议的服务）注册，创建一个 API Key
 2. 右键 `cloudfunctions/askCampus` →「上传并部署：云端安装依赖」
